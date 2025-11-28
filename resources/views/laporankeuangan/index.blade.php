@@ -1,134 +1,227 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-[80vh] flex flex-col items-center justify-center px-2 py-4 bg-gradient-to-br from-gray-50 via-white to-gray-100">
+<div class="min-h-screen py-10">
+    <div class="max-w-5xl mx-auto px-4">
 
-    <!-- Header & Search -->
-    <div class="w-full max-w-5xl flex flex-col md:flex-row justify-between items-center gap-3 mb-6">
-        <div class="w-full md:w-auto text-center md:text-left">
-            <h1 class="font-extrabold text-2xl sm:text-3xl text-gray-800 mb-1 leading-tight">Laporan Keuangan</h1>
-            <div class="text-gray-400 font-normal text-sm">Rekap pengeluaran & pemasukan kamu bulan ini</div>
+        {{-- HEADER --}}
+        <div class="mb-6">
+            <p class="text-xs font-semibold tracking-[0.28em] text-emerald-500 uppercase">
+                Laporan
+            </p>
+            <h1 class="mt-1 text-3xl font-semibold text-slate-900">
+                Rekap Pengeluaran
+            </h1>
+            <p class="mt-1 text-sm text-slate-600">
+                Lihat total belanja per bulan berdasarkan tahun yang kamu pilih.
+            </p>
         </div>
-        <form class="flex items-center bg-white border border-gray-200 rounded-full px-5 py-2 shadow-sm gap-2 w-full md:w-auto max-w-xs">
-            <input
-                type="text"
-                class="w-full bg-transparent outline-none border-0 focus:ring-0 text-gray-700 text-sm"
-                placeholder="Cari laporan...">
-            <button class="text-gray-400 hover:text-rose-500 transition" type="submit">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-        </form>
-    </div>
 
-    <!-- Info Cards -->
-    <div class="w-full max-w-5xl grid grid-cols-1 sm:grid-cols-3 gap-5 mb-7">
-        <div class="rounded-2xl bg-gradient-to-br from-emerald-50 via-white to-emerald-100 border border-emerald-100 p-6 text-center shadow-sm">
-            <div class="font-medium text-emerald-700 mb-1">Pendapatan Tahun Ini</div>
-            <div class="text-2xl font-bold text-emerald-700 tracking-wide">Rp {{ number_format($total_pendapatan,0,',','.') }}</div>
-        </div>
-        <div class="rounded-2xl bg-gradient-to-br from-rose-50 via-white to-rose-100 border border-rose-100 p-6 text-center shadow-sm">
-            <div class="font-medium text-rose-600 mb-1">Budget Belanja Tahun</div>
-            <div class="text-2xl font-bold text-rose-600 tracking-wide">Rp {{ number_format($budget_belanja,0,',','.') }}</div>
-        </div>
-        <div class="rounded-2xl bg-gradient-to-br from-indigo-50 via-white to-indigo-100 border border-indigo-100 p-6 text-center shadow-sm">
-            <div class="font-medium text-indigo-600 mb-1">Saldo Bersih Akhir</div>
-            <div class="text-2xl font-bold text-indigo-600 tracking-wide">Rp {{ number_format($saldo_bersih,0,',','.') }}</div>
-        </div>
-    </div>
+        {{-- 2 CARD: RINGKASAN & DONUT --}}
+        <div class="mb-6 grid grid-cols-1 gap-5 md:grid-cols-2">
+            {{-- Ringkasan tahun --}}
+            <div class="rounded-2xl bg-white shadow-md border border-slate-200 p-5">
+                <h2 class="text-sm font-semibold text-slate-900 mb-4">
+                    Ringkasan Tahun {{ $tahun }}
+                </h2>
+                <dl class="space-y-3 text-sm">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-slate-500">Total Pendapatan</dt>
+                        <dd class="font-semibold text-emerald-600">
+                            Rp {{ number_format($total_pendapatan, 0, ',', '.') }}
+                        </dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-slate-500">Budget Belanja</dt>
+                        <dd class="font-semibold text-sky-600">
+                            Rp {{ number_format($budget_belanja, 0, ',', '.') }}
+                        </dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-slate-500">Total Pengeluaran</dt>
+                        <dd class="font-semibold text-red-600">
+                            Rp {{ number_format($total_pengeluaran, 0, ',', '.') }}
+                        </dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-slate-500">Saldo Bersih</dt>
+                        <dd class="font-semibold text-slate-900">
+                            Rp {{ number_format($saldo_bersih, 0, ',', '.') }}
+                        </dd>
+                    </div>
+                </dl>
+            </div>
 
-    <!-- Main Section: Grid 2 kolom -->
-    <div class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-7 bg-white/90 rounded-2xl shadow-lg border border-gray-100 p-7">
-        <!-- Table Bulanan -->
-        <div class="flex flex-col">
-            <div class="flex items-center justify-between mb-2">
-                <span class="font-semibold text-gray-700 text-base">Belanja Bulanan</span>
-                <div>
-                    <button class="rounded-full px-3 py-1 border border-gray-300 text-lg text-gray-400 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition"><i class="fa-solid fa-plus"></i></button>
-                    <button class="ml-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm border transition">Edit</button>
+            {{-- Donut chart --}}
+            <div class="rounded-2xl bg-white shadow-md border border-slate-200 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-slate-900">
+                        Komposisi Keuangan
+                    </h2>
+                    <p class="text-xs text-slate-500">
+                        Pendapatan vs Belanja vs Saldo
+                    </p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="w-32 h-32 mx-auto">
+                        <canvas id="donut-chart"></canvas>
+                    </div>
+                    <div class="flex-1 space-y-2 text-xs">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                                <span class="text-slate-600">Pendapatan</span>
+                            </div>
+                            <span class="font-semibold text-slate-900">
+                                {{ $persen_pendapatan }}%
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                <span class="text-slate-600">Pengeluaran</span>
+                            </div>
+                            <span class="font-semibold text-slate-900">
+                                {{ $persen_pengeluaran }}%
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-slate-500"></span>
+                                <span class="text-slate-600">Saldo</span>
+                            </div>
+                            <span class="font-semibold text-slate-900">
+                                {{ $persen_saldo }}%
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="rounded-xl overflow-hidden border border-gray-200 bg-white">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="py-2 px-4 font-semibold text-gray-500">Bulan</th>
-                            <th class="py-2 px-4 font-semibold text-gray-500">Total Belanja</th>
+        </div>
+
+        {{-- CARD TABEL BULAN / TOTAL BELANJA --}}
+        <div class="rounded-2xl bg-white shadow-xl border border-slate-200">
+            <div class="flex flex-col gap-3 border-b border-slate-200 px-6 py-4 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-slate-900">
+                        Detail Bulanan {{ $tahun }}
+                    </h2>
+                    <p class="text-xs text-slate-500">
+                        Bulan &mdash; Total Belanja
+                    </p>
+                </div>
+
+                {{-- DROPDOWN TAHUN --}}
+                <form
+                    action="{{ route('belanja.pengeluaran.index') }}"
+                    method="GET"
+                    id="filter-year-form-bottom"
+                    class="w-full md:w-auto"
+                >
+                    <label for="tahun_bottom" class="block text-xs font-semibold text-slate-700 mb-1">
+                        Pilih Tahun
+                    </label>
+                    <div class="relative w-full md:w-40">
+                        <select
+                            name="tahun"
+                            id="tahun_bottom"
+                            class="w-full rounded-lg border border-slate-300 bg-white pl-3 pr-8 py-2 text-sm text-slate-900 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-400/30 cursor-pointer"
+                            onchange="document.getElementById('filter-year-form-bottom').submit()"
+                        >
+                            @foreach($daftar_tahun as $t)
+                                <option value="{{ $t }}" {{ (int)$tahun === (int)$t ? 'selected' : '' }}>
+                                    {{ $t }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute inset-y-0 right-2 flex items-center text-slate-400">
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="px-6 py-4 overflow-x-auto">
+                <table class="min-w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-left text-xs font-semibold text-slate-500">
+                            <th class="py-2">Bulan</th>
+                            <th class="py-2 text-right">Total Belanja</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($laporan_bulanan as $laporan)
-                        <tr class="border-b last:border-0 hover:bg-gray-50">
-                            <td class="py-2 px-4">{{ $laporan['bulan'] }}</td>
-                            <td class="py-2 px-4 text-gray-700">Rp {{ number_format($laporan['total_belanja'],0,',','.') }}</td>
-                        </tr>
-                        @endforeach
+                        @if(!$adaDataTahunIni)
+                            <tr>
+                                <td colspan="2" class="py-4 text-center text-sm text-slate-500">
+                                    Belum ada data untuk tahun ini.
+                                </td>
+                            </tr>
+                        @else
+                            @foreach($laporan_bulanan as $row)
+                                <tr class="border-b border-slate-100 last:border-0">
+                                    <td class="py-2 text-slate-800">
+                                        {{ $row['bulan'] }}
+                                    </td>
+                                    <td class="py-2 text-right text-slate-900 font-medium">
+                                        Rp {{ number_format($row['total_belanja'], 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Diagram Donut -->
-        <div class="flex flex-col items-center justify-center gap-4">
-            <span class="font-semibold text-gray-700 text-base mb-3">Diagram Bulanan</span>
-            <div class="flex flex-row gap-5 w-full justify-center">
-                <!-- Donut Pendapatan -->
-                <div class="bg-gradient-to-tr from-emerald-50 via-white to-emerald-100 rounded-xl border border-emerald-100 shadow px-5 py-4 flex flex-col items-center w-32">
-                    <span class="text-xs text-emerald-600 mb-1">Pendapatan</span>
-                    <div class="relative w-16 h-16 mb-1">
-                        <svg class="absolute" width="64" height="64">
-                            <circle cx="32" cy="32" r="28" stroke="#e5e7eb" stroke-width="7" fill="none"/>
-                            <circle cx="32" cy="32" r="28"
-                                stroke="#10b981"
-                                stroke-width="7"
-                                stroke-dasharray="{{ (2 * 3.14 * 28) }}"
-                                stroke-dashoffset="{{ (2 * 3.14 * 28) - ((2 * 3.14 * 28) * $persen_pendapatan / 100) }}"
-                                fill="none"
-                                style="transition:stroke-dashoffset 0.5s;"></circle>
-                        </svg>
-                        <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold text-emerald-700">{{ $persen_pendapatan }}%</span>
-                    </div>
-                </div>
-                <!-- Donut Pengeluaran -->
-                <div class="bg-gradient-to-tr from-rose-50 via-white to-rose-100 rounded-xl border border-rose-100 shadow px-5 py-4 flex flex-col items-center w-32">
-                    <span class="text-xs text-rose-600 mb-1">Pengeluaran</span>
-                    <div class="relative w-16 h-16 mb-1">
-                        <svg class="absolute" width="64" height="64">
-                            <circle cx="32" cy="32" r="28" stroke="#e5e7eb" stroke-width="7" fill="none"/>
-                            <circle cx="32" cy="32" r="28"
-                                stroke="#f43f5e"
-                                stroke-width="7"
-                                stroke-dasharray="{{ (2 * 3.14 * 28) }}"
-                                stroke-dashoffset="{{ (2 * 3.14 * 28) - ((2 * 3.14 * 28) * $persen_pengeluaran / 100) }}"
-                                fill="none"
-                                style="transition:stroke-dashoffset 0.5s;"></circle>
-                        </svg>
-                        <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold text-rose-600">{{ $persen_pengeluaran }}%</span>
-                    </div>
-                </div>
-                <!-- Donut Saldo -->
-                <div class="bg-gradient-to-tr from-indigo-50 via-white to-indigo-100 rounded-xl border border-indigo-100 shadow px-5 py-4 flex flex-col items-center w-32">
-                    <span class="text-xs text-indigo-600 mb-1">Saldo Akhir</span>
-                    <div class="relative w-16 h-16 mb-1">
-                        <svg class="absolute" width="64" height="64">
-                            <circle cx="32" cy="32" r="28" stroke="#e5e7eb" stroke-width="7" fill="none"/>
-                            <circle cx="32" cy="32" r="28"
-                                stroke="#6366f1"
-                                stroke-width="7"
-                                stroke-dasharray="{{ (2 * 3.14 * 28) }}"
-                                stroke-dashoffset="{{ (2 * 3.14 * 28) - ((2 * 3.14 * 28) * $persen_saldo / 100) }}"
-                                fill="none"
-                                style="transition:stroke-dashoffset 0.5s;"></circle>
-                        </svg>
-                        <span class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-bold text-indigo-600">{{ $persen_saldo }}%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer Tahun -->
-    <div class="w-full max-w-5xl flex justify-end mt-10">
-        <span class="rounded-lg px-5 py-2 bg-white border border-gray-200 text-gray-500 text-sm font-semibold shadow-sm">Tahun {{ $tahun }}</span>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('donut-chart');
+        if (!ctx) return;
+
+        const data = {
+            labels: ['Pendapatan', 'Pengeluaran', 'Saldo'],
+            datasets: [{
+                data: [
+                    {{ $persen_pendapatan }},
+                    {{ $persen_pengeluaran }},
+                    {{ $persen_saldo }},
+                ],
+                backgroundColor: [
+                    'rgba(16, 185, 129, 0.95)',
+                    'rgba(239, 68, 68, 0.95)',
+                    'rgba(100, 116, 139, 0.95)',
+                ],
+                borderWidth: 0,
+                hoverOffset: 4,
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: data,
+            options: {
+                cutout: '65%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15,23,42,0.9)',
+                        bodyFont: { size: 11 },
+                        padding: 8,
+                        callbacks: {
+                            label: function (context) {
+                                return context.label + ': ' + context.parsed + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\PengeluaranBulanan;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class PengeluaranBulananSeeder extends Seeder
@@ -18,18 +18,38 @@ class PengeluaranBulananSeeder extends Seeder
 
         $users = User::all();
 
-        foreach ($users as $user) {
-            for ($month = 1; $month <= 12; $month++) {
-                $totalPengeluaran = rand((int)($user->budget_bulanan * 0.5), (int)$user->budget_bulanan);
-                $saldoBersih = $user->pendapatan_bulanan - $totalPengeluaran;
+        // Tahun yang ingin di-seed (sebelum 2025)
+        $years = [2023, 2024, (int) date('Y')];
 
-                PengeluaranBulanan::create([
-                    'user_id' => $user->id,
-                    'bulan' => $month,
-                    'tahun' => date('Y'),
-                    'total_pengeluaran' => $totalPengeluaran,
-                    'saldo_bersih' => $saldoBersih,
-                ]);
+        foreach ($users as $user) {
+            foreach ($years as $year) {
+                for ($month = 1; $month <= 12; ++$month) {
+                    // fallback kalau user belum punya budget/pendapatan
+                    $budgetBulanan = $user->budget_bulanan ?? 2_000_000;
+                    $pendapatanBulanan = $user->pendapatan_bulanan ?? 4_000_000;
+
+                    $min = (int) ($budgetBulanan * 0.5);
+                    $max = (int) $budgetBulanan;
+
+                    // jaga-jaga biar rand tidak error
+                    if ($min < 0) {
+                        $min = 0;
+                    }
+                    if ($max <= $min) {
+                        $max = $min + 1;
+                    }
+
+                    $totalPengeluaran = rand($min, $max);
+                    $saldoBersih = $pendapatanBulanan - $totalPengeluaran;
+
+                    PengeluaranBulanan::create([
+                        'user_id' => $user->id,
+                        'bulan' => $month,
+                        'tahun' => $year,
+                        'total_pengeluaran' => $totalPengeluaran,
+                        'saldo_bersih' => $saldoBersih,
+                    ]);
+                }
             }
         }
     }

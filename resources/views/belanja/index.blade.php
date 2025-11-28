@@ -1,85 +1,132 @@
 @extends('layouts.app')
-@section('content')
-<div class="max-w-5xl mx-auto mt-10 mb-8">
 
-    <!-- Title & Add Button -->
-    <div class="flex flex-col-reverse justify-between sm:flex-row sm:items-center gap-5 mb-7">
+@section('content')
+<div class="max-w-5xl mx-auto mt-10 mb-8 px-4">
+
+    {{-- TITLE --}}
+    <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-4 mb-7">
         <h2 class="font-bold text-2xl text-[#ed000c] flex items-center gap-2 tracking-tight">
-            <span class="inline-flex items-center rounded-xl bg-gradient-to-r from-[#ed000c]/20 via-rose-400/10 to-rose-400/30 px-2 py-1 drop-shadow">
+            <span class="inline-flex items-center rounded-xl bg-[#ed000c]/10 px-2 py-1">
                 <i class="fas fa-list"></i>
             </span>
-            List Belanja <span class="text-gray-400 font-medium text-lg">| {{ $tanggalBelanja->format('d F Y') }}</span>
+            List Belanja
+            <span class="text-gray-400 font-medium text-lg">
+                | {{ $tanggalBelanja->format('d F Y') }}
+            </span>
         </h2>
+
         <a href="{{ route('belanja.item.create') }}"
-           class="bg-gradient-to-r from-[#ed000c] to-rose-400 hover:from-rose-500 hover:to-[#ed000c] text-white px-5 py-2.5 rounded-xl shadow-lg font-semibold flex items-center gap-2 text-base transition-all">
-            <i class="fa fa-plus"></i> Tambah Item
+           class="inline-flex items-center gap-2 bg-[#ed000c] hover:bg-red-600 text-white px-5 py-2.5 rounded-xl shadow-md font-semibold text-sm sm:text-base transition">
+            <i class="fa fa-plus"></i>
+            Tambah Item
         </a>
     </div>
 
-    <!-- Search -->
-    <form method="GET" action="{{ route('belanja.item.index') }}" class="flex mb-5 gap-2">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari barang atau kategori..."
-               class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:border-[#ed000c] focus:ring-2 focus:ring-[#ed000c]/20 transition text-base bg-white shadow-sm"/>
-        <button type="submit"
-            class="bg-gradient-to-r from-[#ed000c] to-rose-400 text-white px-5 py-2 rounded-xl hover:from-rose-500 hover:to-[#ed000c] transition shadow-lg flex items-center gap-2 font-semibold text-base">
-            <i class="fa fa-search"></i> Cari
+    {{-- SEARCH --}}
+    <form method="GET" action="{{ route('belanja.item.index') }}" class="flex flex-col sm:flex-row gap-2 mb-5">
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="Cari barang atau kategori..."
+            class="w-full px-4 py-2 border border-slate-200 rounded-xl bg-white text-sm sm:text-base shadow-sm focus:border-[#ed000c] focus:ring-2 focus:ring-[#ed000c]/20 transition"
+        />
+        <button
+            type="submit"
+            class="inline-flex items-center justify-center gap-2 bg-[#ed000c] hover:bg-red-600 text-white px-4 sm:px-5 py-2 rounded-xl shadow-md font-semibold text-sm sm:text-base transition"
+        >
+            <i class="fa fa-search"></i>
+            Cari
         </button>
     </form>
 
-    <!-- Table -->
-    <div class="overflow-x-auto mt-1 rounded-2xl shadow-lg border border-gray-100 bg-white/95">
-        <table class="min-w-full text-sm text-gray-700">
+    {{-- TABLE --}}
+    <div class="overflow-x-auto rounded-2xl shadow-md border border-slate-100 bg-white">
+        <table class="min-w-full text-sm text-slate-700">
             <thead>
-                <tr>
-                    <th class="p-3 font-semibold text-left bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none rounded-tl-2xl">Nama Barang</th>
-                    <th class="p-3 font-semibold text-center bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none">Qty</th>
-                    <th class="p-3 font-semibold text-center bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none">Harga Satuan</th>
-                    <th class="p-3 font-semibold text-center bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none">Total Harga</th>
-                    <th class="p-3 font-semibold text-center bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none">Status</th>
-                    <th class="p-3 font-semibold text-center bg-gradient-to-r from-[#ed000c]/80 to-rose-400/70 text-white border-none rounded-tr-2xl">Aksi</th>
+                <tr class="bg-gradient-to-r from-[#ed000c]/90 to-rose-400/80 text-white text-xs uppercase tracking-wide">
+                    <th class="p-3 text-left rounded-tl-2xl">Nama Barang</th>
+                    <th class="p-3 text-center">Qty</th>
+                    <th class="p-3 text-center">Harga Satuan</th>
+                    <th class="p-3 text-center">Total Harga</th>
+                    <th class="p-3 text-center">Status</th>
+                    <th class="p-3 text-center rounded-tr-2xl">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($itemBelanjas as $item)
-                <tr class="transition-all hover:bg-gradient-to-r hover:from-rose-50 hover:to-[#ed000c]/10 border-b">
-                    <td class="p-3">
-                        <span class="font-medium group-hover:text-[#ed000c]">{{ $item->nama_barang }}</span>
-                    </td>
-                    <td class="p-3 text-center">{{ $item->qty }}</td>
-                    <td class="p-3 text-center">Rp{{ number_format($item->harga_satuan, 0, ',', '.') }}</td>
-                    <td class="p-3 text-center font-bold text-gray-900">Rp{{ number_format($item->total_harga, 0, ',', '.') }}</td>
-                    <td class="p-3 text-center">
-                        <form method="POST" action="{{ route('belanja.item.update', $item->id) }}">
-                            @csrf @method('PATCH')
-                            <button type="submit" name="status" value="{{ $item->status == 'Sudah Dibeli' ? 'Belum Dibeli' : 'Sudah Dibeli' }}"
-                                    class="px-4 py-1 rounded-full font-bold shadow-sm focus:outline-none transition-all
-                                    bg-white/60 ring-2 ring-offset-2
-                                        {{ $item->status == 'Sudah Dibeli' ? 'ring-emerald-400 text-emerald-700 hover:bg-emerald-50'
-                                                                         : 'ring-yellow-400 text-yellow-600 hover:bg-yellow-50' }}">
-                                {{ $item->status }}
-                            </button>
-                        </form>
-                    </td>
-                    <td class="p-3 flex justify-center gap-1">
-                        <a href="{{ route('belanja.item.edit', $item->id) }}"
-                            class="inline-flex items-center px-3 py-1 rounded-full bg-white/80 border border-sky-300 text-sky-500 hover:bg-sky-100 hover:text-sky-700 shadow transition font-bold"
-                            title="Edit">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                        <form action="{{ route('belanja.item.destroy', $item->id) }}" method="POST" class="inline-block delete-item-form">
-                            @csrf @method('DELETE')
-                            <button type="submit"
-                                class="px-3 py-1 rounded-full bg-white/80 border border-rose-400 text-rose-600 hover:bg-rose-100 hover:text-rose-700 shadow transition font-bold"
-                                title="Hapus">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+                    <tr class="border-b border-slate-100 odd:bg-white even:bg-rose-50/60 hover:bg-rose-50 transition">
+                        <td class="p-3 text-left font-medium text-slate-900">
+                            {{ $item->nama_barang }}
+                        </td>
+                        <td class="p-3 text-center">
+                            {{ $item->qty }}
+                        </td>
+                        <td class="p-3 text-center">
+                            Rp {{ number_format($item->harga_satuan, 0, ',', '.') }}
+                        </td>
+                        <td class="p-3 text-center font-semibold text-slate-900">
+                            Rp {{ number_format($item->total_harga, 0, ',', '.') }}
+                        </td>
+                        <td class="p-3 text-center">
+                            {{-- TOGGLE STATUS --}}
+                            <form method="POST" action="{{ route('belanja.item.update', $item->id) }}">
+                                @csrf
+                                @method('PATCH')
+
+                                @php
+                                    $isSudah = $item->status === 'Sudah Dibeli';
+                                    $nextStatus = $isSudah ? 'Belum Dibeli' : 'Sudah Dibeli';
+                                @endphp
+
+                                <input type="hidden" name="nama_barang" value="{{ $item->nama_barang }}">
+                                <input type="hidden" name="qty" value="{{ $item->qty }}">
+                                <input type="hidden" name="harga_satuan" value="{{ $item->harga_satuan }}">
+                                <input type="hidden" name="status" value="{{ $nextStatus }}">
+
+                                <button
+                                    type="submit"
+                                    class="px-4 py-1.5 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 shadow-sm ring-2 ring-offset-1 transition
+                                        {{ $isSudah
+                                            ? 'bg-emerald-50 text-emerald-700 ring-emerald-300 hover:bg-emerald-100'
+                                            : 'bg-amber-50 text-amber-700 ring-amber-300 hover:bg-amber-100' }}"
+                                    title="Klik untuk ubah ke {{ $nextStatus }}"
+                                >
+                                    <span class="h-1.5 w-1.5 rounded-full {{ $isSudah ? 'bg-emerald-500' : 'bg-amber-400' }}"></span>
+                                    {{ $item->status }}
+                                </button>
+                            </form>
+                        </td>
+                        <td class="p-3">
+                            <div class="flex justify-center gap-2">
+                                <a
+                                    href="{{ route('belanja.item.edit', $item->id) }}"
+                                    class="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-white border border-sky-300 text-sky-500 hover:bg-sky-50 hover:text-sky-700 shadow-sm text-xs font-semibold transition"
+                                    title="Edit"
+                                >
+                                    <i class="fa fa-edit"></i>
+                                </a>
+
+                                <form action="{{ route('belanja.item.destroy', $item->id) }}" method="POST" class="delete-item-form inline-block">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button
+                                        type="submit"
+                                        class="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-white border border-rose-300 text-rose-600 hover:bg-rose-50 hover:text-rose-700 shadow-sm text-xs font-semibold transition"
+                                        title="Hapus"
+                                    >
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="6" class="p-5 text-center text-base text-gray-400 bg-gradient-to-r from-rose-100/70 via-white to-[#ed000c]/30 rounded-b-lg">Tidak ada barang belanja untuk hari ini.</td>
-                </tr>
+                    <tr>
+                        <td colspan="6" class="p-5 text-center text-base text-slate-400 bg-rose-50 rounded-b-2xl">
+                            Tidak ada barang belanja untuk hari ini.
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

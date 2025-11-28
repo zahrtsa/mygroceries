@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\UserSettingController;
 use App\Http\Controllers\Belanja\BelanjaController;
 use App\Http\Controllers\Belanja\DashboardController;
 use App\Http\Controllers\Belanja\ItemBelanjaController;
@@ -26,6 +27,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 // Profile
 Route::middleware('auth')->group(function () {
+    Route::resource('settings', UserSettingController::class)
+        ->only(['edit', 'update']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
